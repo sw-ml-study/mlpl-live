@@ -1,0 +1,2269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="mlpl-build" content="7f589dc2 2026-09-02T23:55:07Z stable">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MLPL — Array Programming Language for ML</title>
+    
+<script type="module">
+import init, * as bindings from '/mlpl-web-24e25a18aa87456e.js';
+const wasm = await init({ module_or_path: '/mlpl-web-24e25a18aa87456e_bg.wasm' });
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script>
+    <link rel="icon" href="/favicon-31c28a69865ebe2b.ico" integrity="sha384-dYOp5HPtgcVJNpgY9aJzLcaf8cB2SOg7pMoVVpJ6pdpZI8ww94WDtK16GRLmglhk"/>
+    
+    
+    
+    
+    
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+            "d3": "https://cdn.jsdelivr.net/npm/d3@7/+esm"
+        }
+    }
+    </script>
+    <script type="module" src="js/stage3d.js?v=8558760912a9"></script>
+    <style>
+        /* Catppuccin Mocha */
+        :root {
+            --crust: #11111b;
+            --mantle: #181825;
+            --base: #1e1e2e;
+            --surface0: #313244;
+            --surface1: #45475a;
+            --surface2: #585b70;
+            --overlay0: #6c7086;
+            --overlay1: #7f849c;
+            --overlay2: #9399b2;
+            --subtext0: #a6adc8;
+            --subtext1: #bac2de;
+            --text: #cdd6f4;
+            --lavender: #b4befe;
+            --blue: #89b4fa;
+            --sapphire: #74c7ec;
+            --sky: #89dceb;
+            --teal: #94e2d5;
+            --green: #a6e3a1;
+            --yellow: #f9e2af;
+            --peach: #fab387;
+            --maroon: #eba0ac;
+            --red: #f38ba8;
+            --mauve: #cba6f7;
+            --pink: #f5c2e7;
+            --flamingo: #f2cdcd;
+            --rosewater: #f5e0dc;
+            --mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--mono);
+            font-size: 15px;
+            background: var(--base);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        header {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--surface1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .title-badge {
+            height: 28px;
+            width: auto;
+            display: block;
+        }
+        .title-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+        .title-line {
+            font-size: 13px;
+            color: var(--overlay2);
+            font-weight: 600;
+        }
+        .status-badge {
+            display: inline-block;
+            margin-top: 2px;
+            padding: 1px 8px;
+            border-radius: 9px;
+            font-size: 0.62rem;
+            letter-spacing: 0.04em;
+            width: fit-content;
+            border: 1px solid transparent;
+        }
+        .status-badge-fresh {
+            color: #9fdfae;
+            border-color: #2f6f3f;
+            background: #16301c;
+        }
+        .status-badge-stale {
+            color: #ffd28a;
+            border-color: #8a6320;
+            background: #33260e;
+            cursor: pointer;
+        }
+        .status-badge-unknown {
+            color: #9aa4ad;
+            border-color: #45505a;
+            background: #1d242b;
+        }
+        .title-subtitle {
+            font-size: 11px;
+            color: var(--overlay0);
+            font-style: italic;
+        }
+        #app {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+        }
+        main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+        }
+        footer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 20px;
+            font-size: 0.85em;
+            color: var(--overlay0);
+            border-top: 1px solid var(--surface1);
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        footer a {
+            color: var(--blue);
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        .footer-sep { color: var(--surface2); }
+
+        /* GitHub corner */
+        .github-corner {
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 100;
+            pointer-events: none;
+        }
+        .github-corner svg {
+            pointer-events: auto;
+            fill: var(--blue);
+            color: var(--base);
+        }
+        .github-corner:hover .octo-arm {
+            animation: octocat-wave 560ms ease-in-out;
+        }
+        @keyframes octocat-wave {
+            0%, 100% { transform: rotate(0); }
+            20%, 60% { transform: rotate(-25deg); }
+            40%, 80% { transform: rotate(10deg); }
+        }
+
+        /* Header tabs */
+        .header-tabs {
+            margin-left: auto;
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .header-tabs .tab {
+            background: var(--surface0);
+            color: var(--text);
+            border: 1px solid var(--surface1);
+            border-radius: 4px;
+            padding: 6px 14px;
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .header-tabs .tab:hover {
+            border-color: var(--blue);
+        }
+        .header-tabs .tab.active {
+            background: var(--surface1);
+            color: var(--blue);
+            border-color: var(--blue);
+        }
+        /* REPL/Editor are one segmented toggle: a joined pair whose
+           active segment is filled (not just outlined) so the current
+           workspace view -- interactive REPL vs script Editor -- reads
+           at a glance and stays visually distinct from Tutorial/Paths. */
+        .view-toggle {
+            display: inline-flex;
+            border: 1px solid var(--blue);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .header-tabs .view-toggle .tab {
+            border: none;
+            border-radius: 0;
+        }
+        .header-tabs .view-toggle .tab + .tab {
+            border-left: 1px solid var(--surface1);
+        }
+        .header-tabs .view-toggle .tab.active {
+            background: var(--blue);
+            color: var(--crust);
+        }
+        header > .help-btn {
+            margin-right: 60px;
+        }
+        /* Mode bar (per-tab controls under the header) */
+        .modebar {
+            padding: 8px 20px;
+            border-bottom: 1px solid var(--surface1);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .modebar.repl {
+            background: var(--mantle);
+        }
+        .modebar.tutorial {
+            background: var(--mantle);
+        }
+        .demo-select {
+            background: var(--surface0);
+            color: var(--text);
+            border: 1px solid var(--surface1);
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-family: var(--mono);
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .demo-select:hover {
+            border-color: var(--blue);
+        }
+        /* Custom (non-native) demo picker. The native <select> /
+           <optgroup> cannot be styled reliably (Safari ignores
+           optgroup styling; Chrome ignores its font-size), so the
+           demo-GROUP names rendered as low-contrast muted text.
+           These are ordinary styled elements, legible everywhere. */
+        .demo-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .demo-dropdown-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 40;
+        }
+        .demo-dropdown-panel {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            z-index: 41;
+            width: min(420px, calc(100vw - 24px));
+            /* Cap to the viewport and scroll vertically: a single expanded
+               super-group (e.g. Machine learning) can be taller than the
+               screen, and the accordion alone no longer bounds it, so the
+               bottom rows were unreachable. `overflow-y: auto` coerces
+               overflow-x to a clip, so the side tooltips (rendered at
+               left: 100% + 12px) can be trimmed at the panel's right edge
+               while scrolling -- an accepted trade for reaching every demo;
+               a portal-rendered tooltip is the longer-term fix. */
+            max-height: min(72vh, calc(100vh - 96px));
+            overflow-y: auto;
+            background: var(--base);
+            border: 1px solid var(--surface1);
+            border-radius: 6px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            padding: 4px;
+        }
+        /* Nested demo menu: collapsible super-groups (top level), each
+           expanding to its category sections + demo rows. */
+        .demo-super:not(:last-child) {
+            border-bottom: 1px solid var(--surface0);
+        }
+        .demo-super-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-radius: 4px;
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 14px;
+            font-weight: 700;
+            padding: 9px 12px;
+            cursor: pointer;
+            text-align: left;
+        }
+        .demo-super-header:hover {
+            background: var(--surface0);
+        }
+        .demo-super-caret {
+            color: var(--blue);
+            font-size: 11px;
+            width: 12px;
+            flex: none;
+        }
+        .demo-super-label {
+            flex: 1;
+        }
+        .demo-super-count {
+            color: var(--subtext0);
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .demo-super-body {
+            padding: 2px 0 8px 10px;
+        }
+        .demo-group {
+            width: auto;
+        }
+        .demo-group-label {
+            font-family: var(--mono);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--lavender);
+            padding: 6px 10px 2px;
+            letter-spacing: 0.02em;
+        }
+        .demo-item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: transparent;
+            color: var(--text);
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px 5px 20px;
+            font-family: var(--mono);
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .demo-item:hover:not(:disabled) {
+            background: var(--surface0);
+        }
+        .demo-item:disabled {
+            color: var(--subtext0);
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+        /* Immediate, consistent picker explanations. Native `title`
+           popups have a long browser-controlled delay and often do
+           not appear for disabled buttons. The wrapper remains
+           hoverable and keyboard-focusable while the button keeps
+           its real disabled semantics. */
+        .demo-tooltip-target {
+            display: block;
+            position: relative;
+            outline: none;
+        }
+        .demo-tooltip-target::after {
+            content: attr(data-tooltip);
+            display: block;
+            position: absolute;
+            left: calc(100% + 12px);
+            top: 0;
+            z-index: 2;
+            width: 320px;
+            padding: 7px 9px;
+            color: var(--text);
+            background: var(--crust);
+            border: 1px solid var(--surface1);
+            border-color: var(--peach);
+            border-radius: 4px;
+            box-shadow: 0 5px 16px rgba(0, 0, 0, 0.55);
+            font-family: var(--sans);
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.35;
+            white-space: normal;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 100ms ease;
+            transition-delay: 0ms;
+        }
+        .demo-group-label.demo-tooltip-target::after {
+            font-size: 15px;
+            transform: translate(10px, -5px);
+        }
+        .demo-tooltip-target:hover::after,
+        .demo-tooltip-target:focus::after,
+        .demo-tooltip-target:focus-within::after {
+            opacity: 1;
+            visibility: visible;
+            transition-delay: 250ms;
+        }
+        .ctrl-btn {
+            background: var(--surface0);
+            color: var(--text);
+            border: 1px solid var(--surface1);
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-family: var(--mono);
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .ctrl-btn:hover {
+            background: var(--surface1);
+            border-color: var(--blue);
+        }
+        .help-btn {
+            background: var(--surface0);
+            color: var(--blue);
+            border: 1px solid var(--surface1);
+            border-radius: 4px;
+            width: 32px;
+            height: 32px;
+            font-family: var(--mono);
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .help-btn:hover {
+            background: var(--surface1);
+            border-color: var(--blue);
+        }
+        .tour-btn-header {
+            background: var(--surface0);
+            color: var(--peach);
+            border: 1px solid var(--surface1);
+            border-radius: 4px;
+            height: 32px;
+            padding: 0 10px;
+            font-family: var(--mono);
+            font-size: 13px;
+            cursor: pointer;
+            margin-right: 6px;
+        }
+        .tour-btn-header:hover {
+            background: var(--surface1);
+            border-color: var(--peach);
+        }
+
+        /* Connect button + backend picker dropdown */
+        .connect-wrap { position: relative; display: inline-block; margin-right: 6px; }
+        .connect-btn {
+            background: var(--surface0);
+            color: var(--green, #a6e3a1);
+            border: 1px solid var(--surface1);
+            border-radius: 4px;
+            height: 32px;
+            padding: 0 10px;
+            font-family: var(--mono);
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .connect-btn:hover { background: var(--surface1); border-color: var(--green, #a6e3a1); }
+        .connect-panel {
+            position: absolute;
+            right: 0;
+            top: 38px;
+            z-index: 50;
+            min-width: 260px;
+            max-width: 360px;
+            background: var(--surface0, #313244);
+            border: 1px solid var(--surface1, #45475a);
+            border-radius: 6px;
+            padding: 8px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+            font-family: var(--mono);
+            font-size: 12px;
+        }
+        .connect-note { color: var(--subtext1, #bac2de); line-height: 1.5; }
+        .connect-sub { color: var(--overlay1, #7f849c); font-size: 11px; }
+        .connect-item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: transparent;
+            color: var(--text, #cdd6f4);
+            border: 1px solid transparent;
+            border-radius: 4px;
+            padding: 6px 8px;
+            font-family: var(--mono);
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .connect-item:hover { background: var(--surface1); border-color: var(--green, #a6e3a1); }
+
+        /* REPL output area */
+        main {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        /* Tutorial mode: side-by-side panes so the lesson and
+           the live transcript both have meaningful vertical
+           space. Each pane scrolls independently. Stacks
+           vertically on narrow viewports. */
+        /* Saga 36: script editor */
+        .editor-panel {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            /* Editing-mode accent: a coloured top rule frames the whole
+               script pane so it is unmistakably a different mode. */
+            border-top: 3px solid var(--yellow);
+        }
+        .editor-toolbar {
+            display: flex;
+            gap: 8px;
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--surface1);
+            align-items: center;
+            background: var(--mantle);
+        }
+        /* "Editing" indicator: a pulsing dot + label on the left of the
+           toolbar, so the mode is obvious even before you read a button. */
+        .editor-mode-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-right: auto;
+            color: var(--yellow);
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .editor-mode-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--yellow);
+            box-shadow: 0 0 6px var(--yellow);
+            animation: editing-pulse 1.6s ease-in-out infinite;
+        }
+        @keyframes editing-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .editor-mode-dot { animation: none; }
+        }
+        .editor-btn {
+            background: var(--surface0);
+            color: var(--text);
+            border: 1px solid var(--surface1);
+            border-radius: 4px;
+            padding: 4px 14px;
+            font-family: var(--mono);
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .editor-btn:hover { background: var(--surface1); border-color: var(--blue); }
+        .editor-btn-run { background: var(--green); color: var(--crust); border-color: var(--green); font-weight: 600; }
+        .editor-btn-run:hover { opacity: 0.9; }
+        .editor-textarea {
+            flex: 1;
+            min-height: 0;
+            background: var(--base);
+            color: var(--text);
+            border: none;
+            padding: 12px 16px;
+            font-family: var(--mono);
+            font-size: 14px;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+            tab-size: 4;
+        }
+        .editor-textarea::placeholder { color: var(--surface2); }
+
+        /* Saga 35: 3D visualization -- full-width vertical stack */
+        main.viz3d-split {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 0;
+        }
+        main.viz3d-split > .output {
+            /* Give the REPL output roughly half the height so it
+               stays readable when 3D is open. The stage3d-pane
+               takes the rest (flex:1); the drag handle lets the
+               user rebalance from this default. min-height keeps
+               at least ~4 output lines visible even on a short
+               viewport, so 3D can never squeeze the output down
+               to just the prompt. */
+            height: 45vh;
+            min-height: 7em;
+            overflow-y: auto;
+            flex-shrink: 1;
+            flex-grow: 0;
+            padding: 8px 20px;
+        }
+        /* Scroll-up affordance: a sticky hint pinned to the top
+           of the output pane so it's obvious there is earlier
+           output above the visible (auto-scrolled-to-bottom)
+           tail. Only in 3D split, where vertical space is tight. */
+        main.viz3d-split > .output::before {
+            content: "\2191 scroll up for earlier output";
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            display: block;
+            margin: -8px -20px 6px;
+            padding: 2px 0;
+            text-align: center;
+            font-size: 10px;
+            letter-spacing: 0.04em;
+            color: var(--subtext0);
+            background: var(--mantle);
+            border-bottom: 1px solid var(--surface1);
+        }
+        main.viz3d-split > .input-wrap {
+            flex-shrink: 0;
+        }
+        main.viz3d-split > .resize-handle {
+            height: 6px;
+            background: var(--surface1);
+            cursor: ns-resize;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        main.viz3d-split > .resize-handle::after {
+            content: '';
+            width: 40px;
+            height: 3px;
+            background: var(--surface2);
+            border-radius: 2px;
+        }
+        main.viz3d-split > .resize-handle:hover {
+            background: var(--blue);
+        }
+        main.viz3d-split > .stage3d-pane {
+            flex: 1;
+            min-height: 120px;
+        }
+        .stage3d-pane {
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid var(--surface1);
+            min-height: 300px;
+        }
+        .stage3d-wrap {
+            position: relative;
+            flex: 1;
+            min-height: 0;
+        }
+        .stage3d-wrap canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .stage3d-detail {
+            background: var(--mantle);
+            border-top: 1px solid var(--surface1);
+            padding: 10px 16px;
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--text);
+            max-height: 160px;
+            overflow-y: auto;
+        }
+        .stage3d-detail-title {
+            color: var(--peach);
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        /* Saga F: attention heatmap hover-to-trace. While
+           tracing, non-highlighted cells + token labels dim so
+           the hovered query's row and key's column stay legible
+           (Alammar-style "who attends to whom"). */
+        .attn-svg .attn-cell { cursor: crosshair; }
+        .attn-svg .attn-qlabel, .attn-svg .attn-klabel { cursor: pointer; }
+        .attn-svg .attn-cell,
+        .attn-svg .attn-qlabel,
+        .attn-svg .attn-klabel { transition: opacity 0.08s ease; }
+        .attn-svg.tracing .attn-cell { opacity: 0.22; }
+        .attn-svg.tracing .attn-cell.attn-hl { opacity: 1; }
+        .attn-svg.tracing .attn-qlabel,
+        .attn-svg.tracing .attn-klabel { opacity: 0.3; }
+        .attn-svg.tracing .attn-qlabel.attn-hl,
+        .attn-svg.tracing .attn-klabel.attn-hl {
+            opacity: 1;
+            font-weight: 700;
+            fill: var(--peach);
+        }
+        .stage3d-detail-row {
+            color: var(--subtext0);
+            line-height: 1.6;
+        }
+        .stage3d-detail-row strong { color: var(--text); }
+        /* Close-up inspector dialog opened from the yellow
+           selection-pointer click. Modal layer + centered
+           panel; matches the splash/tour visual language. */
+        .stage3d-inspector {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+        }
+        .stage3d-inspector-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(20, 22, 30, 0.75);
+            cursor: pointer;
+        }
+        .stage3d-inspector-panel {
+            position: relative;
+            margin: 4vh auto 0;
+            width: min(720px, 92vw);
+            max-height: 88vh;
+            background: var(--base);
+            border: 1px solid var(--surface1);
+            border-radius: 8px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .stage3d-inspector-close {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: transparent;
+            border: none;
+            color: var(--subtext1);
+            font-size: 24px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 4px 8px;
+        }
+        .stage3d-inspector-close:hover { color: var(--text); }
+        .stage3d-inspector-body {
+            padding: 28px 24px 24px;
+            font-family: var(--mono);
+            font-size: 14px;
+            color: var(--text);
+            overflow-y: auto;
+        }
+        /* "Ask the LLM about this" row at the top of the inspector. */
+        .stage3d-inspector-body .insp-ask {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .stage3d-inspector-body .insp-ask-input {
+            flex: 1;
+            background: var(--mantle);
+            border: 1px solid var(--surface1);
+            border-radius: 4px;
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 13px;
+            padding: 6px 9px;
+            outline: none;
+        }
+        .stage3d-inspector-body .insp-ask-input:focus { border-color: var(--blue); }
+        .stage3d-inspector-body h2 {
+            font-size: 20px;
+            color: var(--peach);
+            margin: 0 0 14px;
+        }
+        .stage3d-inspector-body .insp-row {
+            color: var(--subtext0);
+            line-height: 1.8;
+            margin-bottom: 4px;
+        }
+        .stage3d-inspector-body .insp-row strong { color: var(--text); }
+        .stage3d-inspector-body .insp-section-title {
+            color: var(--mauve);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin: 16px 0 6px;
+        }
+        .stage3d-inspector-body .insp-values {
+            background: var(--mantle);
+            border: 1px solid var(--surface0);
+            border-radius: 4px;
+            padding: 8px 10px;
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--subtext1);
+            max-height: 200px;
+            overflow: auto;
+            white-space: pre;
+        }
+        /* A formatted source listing (a user-function `def`, or any
+           multi-line block from the source indenter). Like .insp-values
+           but it is the headline, so it uses the body text color and
+           wraps long lines while preserving indentation. Unscoped so the
+           inspector ("I") panel and the hover detail panel share it. */
+        .insp-listing {
+            background: var(--mantle);
+            border: 1px solid var(--surface0);
+            border-radius: 4px;
+            padding: 10px 12px;
+            margin: 0 0 12px;
+            font-family: var(--mono);
+            font-size: 13px;
+            line-height: 1.45;
+            color: var(--text);
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .stage3d-inspector-body .insp-hint {
+            color: var(--overlay1);
+            font-size: 12px;
+            font-style: italic;
+            margin-top: 14px;
+        }
+        /* Saga E: op derivation list inside the inspector. Each
+           step is a clickable button row so the user can walk
+           backward through the producer chain. Current-step row
+           is highlighted in peach. */
+        .stage3d-inspector-body .insp-derivation {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 6px;
+        }
+        .stage3d-inspector-body .insp-deriv-step {
+            display: grid;
+            grid-template-columns: max-content max-content 1fr max-content;
+            gap: 8px;
+            align-items: baseline;
+            text-align: left;
+            background: var(--mantle);
+            border: 1px solid var(--surface0);
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--subtext1);
+            cursor: pointer;
+        }
+        .stage3d-inspector-body .insp-deriv-step:hover {
+            background: var(--surface0);
+            border-color: var(--surface1);
+        }
+        .stage3d-inspector-body .insp-deriv-step.current {
+            border-color: var(--peach);
+        }
+        .stage3d-inspector-body .insp-deriv-name {
+            color: var(--peach);
+            font-weight: bold;
+        }
+        .stage3d-inspector-body .insp-deriv-eq {
+            color: var(--overlay0);
+        }
+        .stage3d-inspector-body .insp-deriv-rhs {
+            color: var(--text);
+            overflow-wrap: anywhere;
+        }
+        .stage3d-inspector-body .insp-deriv-shape {
+            color: var(--mauve);
+            font-size: 11px;
+            white-space: nowrap;
+        }
+        .stage3d-nav {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            background: rgba(17, 17, 27, 0.7);
+            border-radius: 6px;
+            padding: 4px 8px;
+        }
+        .stage3d-btn {
+            background: none;
+            border: 1px solid var(--surface2, #45475a);
+            color: var(--text);
+            border-radius: 4px;
+            width: 32px;
+            height: 28px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .stage3d-btn:hover {
+            background: var(--surface1, #313244);
+            border-color: var(--peach);
+        }
+
+        main.tutorial-split {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            grid-template-rows: 1fr;
+            gap: 0;
+            overflow: hidden;
+            padding: 0;
+        }
+        main.tutorial-split .tutorial-pane {
+            overflow: auto;
+            padding: 16px 20px;
+            border-right: 1px solid var(--surface1);
+            min-height: 0;
+        }
+        main.tutorial-split .repl-pane {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+        }
+        main.tutorial-split .repl-pane .output {
+            flex: 1;
+            overflow: auto;
+            padding: 16px 20px;
+        }
+        @media (max-width: 900px) {
+            main.tutorial-split {
+                grid-template-columns: 1fr;
+                grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+            }
+            main.tutorial-split .tutorial-pane {
+                border-right: 0;
+                border-bottom: 1px solid var(--surface1);
+            }
+        }
+        /* "Run all" button in the lesson subnav. */
+        .run-all-btn {
+            background: var(--green);
+            color: var(--base);
+            border: 0;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-left: auto;
+        }
+        .run-all-btn:hover {
+            background: var(--teal);
+        }
+        .output {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+        }
+        .welcome {
+            color: var(--overlay2);
+            margin-bottom: 16px;
+        }
+        .welcome p {
+            margin-bottom: 4px;
+        }
+        .welcome code {
+            color: var(--peach);
+            background: var(--surface0);
+            padding: 1px 6px;
+            border-radius: 3px;
+        }
+        .entry {
+            margin-bottom: 8px;
+        }
+        .narration {
+            background: var(--surface0);
+            border-left: 3px solid var(--sapphire);
+            padding: 10px 14px;
+            margin: 12px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .narration-heading {
+            color: var(--sapphire);
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .narration-body {
+            color: var(--text);
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        .input-line {
+            color: var(--text);
+            /* multi-line defs (kept-comment listings) echo with
+               their line structure intact */
+            white-space: pre-wrap;
+        }
+        .prompt {
+            color: var(--green);
+            font-weight: 700;
+        }
+        .line-comment {
+            color: var(--subtext0);
+            font-style: italic;
+            opacity: 0.85;
+        }
+        .output-line {
+            color: var(--subtext1);
+            /* pre-wrap keeps array column alignment (spaces +
+               newlines) but wraps long lines -- e.g. an :ask /
+               llm_call reply -- so they fit the pane instead of
+               scrolling off to the right. overflow-wrap breaks
+               any single over-long token. */
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            margin-left: 0;
+            font-family: var(--mono);
+            font-size: 15px;
+        }
+        .output-line.error {
+            color: var(--red);
+        }
+        /* Saga 29 step 018: "this line is running" placeholder.
+           The CSS animation runs on the browser compositor
+           thread, so the spinner keeps turning even while the
+           WASM eval blocks the main JS thread. */
+        .entry.running {
+            opacity: 0.85;
+        }
+        .running-line {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--yellow);
+        }
+        .running-text {
+            font-style: italic;
+        }
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--surface2);
+            border-top-color: var(--yellow);
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .telemetry-panel {
+            margin: 2px 0 2px 24px;
+            font-family: var(--mono);
+            font-size: 13px;
+            opacity: 0.85;
+        }
+        .telemetry-line {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: center;
+        }
+        .telemetry-metric { white-space: nowrap; }
+        .telemetry-label { color: var(--subtext1, #9aa); margin-right: 5px; }
+        .telemetry-spark {
+            color: var(--green, #8ada8a);
+            letter-spacing: 1px;
+            white-space: pre;
+        }
+        .telemetry-val { color: var(--subtext1, #9aa); margin-left: 5px; }
+        .telemetry-note { color: var(--peach, #e0a060); }
+        /* Live loss curve during a streamed connect-mode train
+           (connect-telemetry step 002). */
+        .loss-panel {
+            margin: 4px 0 4px 24px;
+            max-width: 420px;
+        }
+        .loss-panel svg {
+            display: block;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+        }
+        .loss-caption {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--subtext1, #9aa);
+            margin-top: 2px;
+        }
+        .output-summary {
+            margin: 2px 0 8px 0;
+        }
+        .output-summary > summary {
+            color: var(--sapphire);
+            cursor: pointer;
+            font-family: var(--mono);
+            font-size: 15px;
+            list-style: none;
+            padding: 2px 0;
+        }
+        .output-summary > summary::-webkit-details-marker {
+            display: none;
+        }
+        .output-summary > summary::before {
+            content: "\25b8  ";
+            color: var(--overlay2);
+            display: inline-block;
+            width: 1em;
+        }
+        .output-summary[open] > summary::before {
+            content: "\25be  ";
+        }
+        .output-summary > summary:hover {
+            color: var(--blue);
+        }
+        .output-summary > pre {
+            margin-top: 4px;
+            padding-left: 1.25em;
+            border-left: 2px solid var(--surface1);
+        }
+        .svg-output {
+            display: inline-block;
+            position: relative;
+            background: var(--mantle);
+            border: 1px solid var(--surface1);
+            border-radius: 6px;
+            padding: 10px;
+            margin: 6px 0;
+        }
+        .svg-download {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface0);
+            border: 1px solid var(--surface1);
+            border-radius: 4px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.6;
+            transition: opacity 0.15s;
+        }
+        .svg-download:hover {
+            opacity: 1;
+        }
+        .svg-output svg {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Input row */
+        .input-wrap {
+            border-top: 1px solid var(--surface1);
+            background: var(--mantle);
+            flex-shrink: 0;
+        }
+        .session-label {
+            padding: 4px 20px 0;
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .session-label.repl {
+            color: var(--green);
+        }
+        .session-label.tutorial {
+            color: var(--peach);
+        }
+        .input-row {
+            display: flex;
+            align-items: center;
+            padding: 4px 20px 12px;
+            flex-shrink: 0;
+        }
+        .input-row input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 15px;
+            margin-left: 4px;
+        }
+        /* Saga 83: Reset button moved from the top modebar
+           into the input row so it lives where the output lives.
+           Sized down a bit since it shares the row with the prompt. */
+        .input-row .input-row-clear {
+            margin-left: 8px;
+            padding: 4px 10px;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        /* 2D | 3D view toggle, sits just before Reset on every
+           REPL input line. Active half is bold + inert; the
+           other half is a link-styled button that flips the
+           view (same effect as the :2d / :3d commands). */
+        .input-row .mode-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 12px;
+            flex-shrink: 0;
+            font-family: var(--mono);
+            font-size: 13px;
+        }
+        .input-row .mode-toggle .mode-sep {
+            color: var(--surface2, #45475a);
+        }
+        .input-row .mode-toggle .mode-opt {
+            background: none;
+            border: none;
+            padding: 0 2px;
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--blue);
+            cursor: pointer;
+        }
+        .input-row .mode-toggle button.mode-opt:hover {
+            text-decoration: underline;
+        }
+        .input-row .mode-toggle .mode-opt.active {
+            color: var(--text);
+            font-weight: 700;
+            cursor: default;
+        }
+
+        /* Saga 33 step 043: tab-completion popup chips. */
+        .completion-popup {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 0 20px 8px;
+            font-family: var(--mono);
+        }
+        .completion-chip {
+            background: var(--surface1, #313244);
+            color: var(--text);
+            border: 1px solid var(--surface2, #45475a);
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-family: var(--mono);
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .completion-chip:hover,
+        .completion-chip.selected {
+            background: var(--surface2, #45475a);
+            border-color: var(--peach);
+        }
+        /* Saga 34 step 002: splash overlay */
+        .splash-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 250;
+            background: rgba(17, 17, 27, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .splash-panel {
+            position: relative;
+            z-index: 1;
+            max-width: 720px;
+            width: 90vw;
+            padding: 40px 48px;
+            text-align: center;
+            color: var(--text);
+            background: url('splash-bg.png?ts=1779748856802') center/cover no-repeat;
+            border-radius: 12px;
+            border: 1px solid rgba(69, 71, 90, 0.5);
+            overflow: hidden;
+        }
+        .splash-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(20, 24, 48, 0.45);
+            border-radius: 12px;
+        }
+        .splash-panel > * { position: relative; z-index: 1; }
+        .splash-header-shim {
+            background: rgba(20, 28, 58, 0.7);
+            border-radius: 8px;
+            padding: 20px 24px 16px;
+            margin-bottom: 20px;
+        }
+        .splash-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: #cdd6f4;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .splash-close:hover { color: #fff; }
+        .splash-panel h2 {
+            font-size: 38px;
+            margin: 0 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            color: #fff;
+        }
+        .splash-panel h2 img {
+            width: 44px;
+            height: 44px;
+        }
+        .splash-version {
+            color: #bac2de;
+            font-family: var(--mono);
+            font-size: 14px;
+            margin: 0 0 2px;
+        }
+        /* UTC Zulu build time so a viewer can identify the build
+           regardless of local timezone (no commit hash on splash). */
+        .splash-buildtime {
+            color: var(--subtext0);
+            font-family: var(--mono);
+            font-size: 12px;
+            margin: 0 0 2px;
+        }
+        /* UI-vs-server build skew: a stale server (or stale page) is
+           the usual cause of a demo misbehaving while the page looks
+           current. Flag it loudly. */
+        .splash-build-skew {
+            color: #f38ba8;
+            font-weight: 700;
+        }
+        .splash-subtitle {
+            color: #cdd6f4;
+            font-size: 18px;
+            margin-bottom: 0;
+            line-height: 1.5;
+        }
+        .splash-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        .splash-card {
+            background: rgba(20, 28, 58, 0.65);
+            border: 1px solid rgba(80, 90, 140, 0.5);
+            border-radius: 8px;
+            padding: 18px 16px;
+            cursor: pointer;
+            color: #e0e4f0;
+            font-size: 16px;
+            text-align: left;
+        }
+        .splash-card:hover {
+            border-color: var(--peach);
+            background: rgba(30, 40, 80, 0.7);
+        }
+        .splash-card strong {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--peach);
+            font-size: 17px;
+        }
+        .splash-actions {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+        }
+        .splash-btn {
+            padding: 12px 28px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            border: 1px solid rgba(80, 90, 140, 0.5);
+        }
+        .splash-btn-primary {
+            background: var(--peach);
+            color: var(--crust);
+            border-color: var(--peach);
+            font-weight: 600;
+        }
+        .splash-btn-secondary {
+            background: rgba(20, 28, 58, 0.65);
+            color: #e0e4f0;
+        }
+        .splash-btn:hover { opacity: 0.9; }
+        .whats-new-list {
+            text-align: left;
+            padding-left: 20px;
+            margin: 0 0 20px;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+        .whats-new-list strong { color: var(--peach); }
+        @media (max-width: 600px) {
+            .splash-cards { grid-template-columns: 1fr; }
+            .splash-panel { padding: 20px 16px; }
+        }
+
+        /* Saga 34 step 003: guided tour */
+        .tour-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 290;
+            background: rgba(17, 17, 27, 0.25);
+        }
+        .tour-spotlight {
+            position: fixed;
+            z-index: 295;
+            border-radius: 6px;
+            box-shadow: 0 0 0 9999px rgba(17, 17, 27, 0.35), 0 0 16px 4px var(--peach);
+            pointer-events: none;
+        }
+        .tour-tooltip {
+            position: fixed;
+            z-index: 300;
+            background: var(--surface0, #313244);
+            border: 1px solid var(--surface2, #45475a);
+            border-radius: 8px;
+            padding: 14px 16px;
+            max-width: 340px;
+            color: var(--text);
+            font-size: 14px;
+        }
+        .tour-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .tour-header strong { color: var(--peach); }
+        .tour-close {
+            background: none;
+            border: none;
+            color: var(--subtext0);
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .tour-body { margin: 0 0 12px; line-height: 1.5; }
+        .tour-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tour-counter {
+            color: var(--subtext0);
+            font-size: 12px;
+            margin-right: auto;
+        }
+        .tour-btn {
+            padding: 4px 14px;
+            border-radius: 4px;
+            border: 1px solid var(--surface2, #45475a);
+            background: transparent;
+            color: var(--text);
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .tour-btn:disabled { opacity: 0.4; cursor: default; }
+        .tour-btn-primary {
+            background: var(--peach);
+            color: var(--crust);
+            border-color: var(--peach);
+        }
+
+        .back-to-path-btn {
+            background: var(--surface0, #313244);
+            color: var(--peach);
+            border: 2px solid var(--peach);
+            border-radius: 6px;
+            padding: 5px 14px;
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 8px;
+            animation: path-pulse 2s ease-in-out infinite;
+        }
+        @keyframes path-pulse {
+            0%, 100% { box-shadow: 0 0 4px rgba(250, 179, 135, 0.3); }
+            50% { box-shadow: 0 0 12px rgba(250, 179, 135, 0.6); }
+        }
+        .back-to-path-btn:hover {
+            background: var(--surface1, #45475a);
+            border-color: var(--peach);
+            animation: none;
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+        .modal {
+            background: var(--mantle);
+            border: 1px solid var(--surface1);
+            border-radius: 8px;
+            width: min(900px, 92vw);
+            height: min(80vh, 800px);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--surface1);
+            padding: 0 8px;
+            flex-shrink: 0;
+        }
+        .tabs {
+            display: flex;
+            flex: 1;
+        }
+        .tab {
+            background: transparent;
+            border: none;
+            color: var(--overlay2);
+            font-family: var(--mono);
+            font-size: 14px;
+            padding: 14px 18px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        .tab:hover {
+            color: var(--text);
+        }
+        .tab.active {
+            color: var(--blue);
+            border-bottom-color: var(--blue);
+        }
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: var(--overlay2);
+            font-size: 28px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 8px 14px;
+        }
+        .close-btn:hover {
+            color: var(--red);
+        }
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        /* Footer "GitHub" repo dialog: a compact modal listing this
+           project + its companion demo repos. Reuses .modal shell. */
+        .modal.compact {
+            height: auto;
+            max-height: 80vh;
+            width: min(560px, 92vw);
+        }
+        .repo-modal-title {
+            flex: 1;
+            font-family: var(--mono);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            padding: 14px 4px 14px 14px;
+        }
+        .repo-section:not(:first-child) {
+            margin-top: 10px;
+        }
+        .repo-section-label {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--blue);
+            /* Outdented: the heading sits left of the indented rows. */
+            padding: 6px 4px 3px 2px;
+        }
+        .repo-row {
+            display: block;
+            text-decoration: none;
+            /* Indented under the outdented section heading. */
+            padding: 8px 12px 8px 22px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+        }
+        .repo-row:hover {
+            background: var(--surface0);
+            border-color: var(--surface1);
+        }
+        .repo-name {
+            display: block;
+            font-family: var(--mono);
+            font-size: 14px;
+            font-weight: 700;
+            /* Neutral, distinct from the blue section heading. */
+            color: var(--text);
+        }
+        .repo-desc {
+            display: block;
+            font-size: 13px;
+            color: var(--subtext0);
+            margin-top: 2px;
+        }
+        .doc-content {
+            font-family: var(--mono);
+            font-size: 13px;
+            line-height: 1.55;
+            color: var(--subtext1);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        /* Glossary tab: search + scrollable entry list */
+        .glossary-view {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            margin: -20px;
+        }
+        .paths-panel {
+            width: min(960px, 100% - 32px);
+            box-sizing: border-box;
+            padding: 16px 24px;
+            color: var(--text);
+            margin: 0 auto;
+            max-height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+        .paths-heading {
+            color: var(--text);
+            margin: 8px 0 12px 0;
+        }
+        .paths-intro {
+            color: var(--subtext1);
+            line-height: 1.5;
+            margin: 0 0 18px 0;
+        }
+        .path-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .path-card {
+            text-align: left;
+            background: var(--surface0);
+            border: 1px solid var(--surface1);
+            color: var(--text);
+            padding: 12px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .path-card:hover {
+            background: var(--surface1);
+            border-color: var(--blue);
+        }
+        .path-card-title {
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .path-card-blurb {
+            color: var(--subtext1);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .path-card-meta {
+            color: var(--subtext0);
+            font-size: 12px;
+            font-family: var(--mono);
+        }
+        .paths-walker-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            position: sticky;
+            top: 0;
+            background: var(--base);
+            padding: 8px 0;
+            border-bottom: 1px solid var(--surface1);
+            z-index: 2;
+            /* Explicit width matches the panel's computed width
+               so the header X coordinates do not move when the
+               body shrinks (a tall narrow diagram had let the
+               panel collapse to the SVG's content width before). */
+            width: 100%;
+        }
+        .paths-walker-title {
+            font-weight: 700;
+            color: var(--text);
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .paths-walker-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface0);
+            border: 1px solid var(--surface1);
+            border-radius: 4px;
+            padding: 2px 8px;
+        }
+        .paths-walker-progress {
+            color: var(--subtext0);
+            font-family: var(--mono);
+            font-size: 13px;
+            min-width: 120px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .paths-walker-body {
+            margin-bottom: 16px;
+        }
+        .path-step {
+            background: var(--mantle);
+            border: 1px solid var(--surface1);
+            border-radius: 6px;
+            padding: 14px 18px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .path-step-kind {
+            display: inline-block;
+            background: var(--blue);
+            color: var(--base);
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            padding: 2px 8px;
+            border-radius: 3px;
+            text-transform: uppercase;
+        }
+        .path-step-title {
+            color: var(--text);
+            margin: 8px 0 6px 0;
+        }
+        .path-step-why {
+            color: var(--subtext1);
+            line-height: 1.5;
+            font-style: italic;
+            margin: 0 0 10px 0;
+        }
+        .path-step-preview {
+            color: var(--subtext1);
+            line-height: 1.5;
+            margin: 0 0 10px 0;
+        }
+        /* Path-body markdown-ish blocks. */
+        .path-body-p {
+            color: var(--subtext1);
+            line-height: 1.55;
+            margin: 0 0 10px 0;
+        }
+        .path-body-p:last-child {
+            margin-bottom: 0;
+        }
+        .path-body-ul,
+        .path-body-ol {
+            color: var(--subtext1);
+            line-height: 1.55;
+            margin: 0 0 10px 0;
+            padding-left: 24px;
+        }
+        .path-body-ul li,
+        .path-body-ol li {
+            margin: 4px 0;
+        }
+        .path-body-code {
+            background: var(--surface0);
+            color: var(--peach);
+            font-family: var(--mono);
+            font-size: 0.92em;
+            padding: 1px 5px;
+            border-radius: 3px;
+        }
+        /* Saga 29 step 024: [[term]] glossary link. */
+        .glossary-link {
+            display: inline;
+            background: transparent;
+            border: 0;
+            color: var(--sapphire);
+            font-family: inherit;
+            font-size: inherit;
+            padding: 0 1px;
+            cursor: pointer;
+            text-decoration: underline dotted;
+            text-underline-offset: 2px;
+        }
+        .glossary-link:hover {
+            color: var(--sky);
+            text-decoration: underline solid;
+        }
+        /* [label](url) hyperlink (e.g. a demo's literate-walkthrough
+           link). Bright blue + slightly larger for readability on the
+           dark narration surface. */
+        .path-body-link {
+            color: var(--blue);
+            font-weight: 600;
+            font-size: 1.05em;
+            text-decoration: underline solid;
+            text-underline-offset: 2px;
+        }
+        .path-body-link:hover {
+            color: var(--sky);
+        }
+        .glossary-popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 24px;
+        }
+        .glossary-popup-card {
+            background: var(--mantle);
+            border: 1px solid var(--surface1);
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            max-width: 720px;
+            width: 100%;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .glossary-popup-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--surface1);
+        }
+        .glossary-popup-title {
+            margin: 0;
+            color: var(--text);
+            font-size: 17px;
+            font-family: var(--mono);
+        }
+        .glossary-popup-close {
+            background: transparent;
+            border: 0;
+            color: var(--subtext0);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .glossary-popup-close:hover {
+            background: var(--surface1);
+            color: var(--text);
+        }
+        .glossary-popup-body {
+            padding: 14px 18px;
+            overflow-y: auto;
+            color: var(--subtext1);
+            line-height: 1.55;
+        }
+        .path-step-error {
+            color: var(--red);
+            font-style: italic;
+        }
+        .path-jump-btn {
+            background: var(--blue);
+            color: var(--base);
+            border: 0;
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .path-jump-btn:hover {
+            background: var(--lavender);
+        }
+        .diagrams-index {
+            padding: 12px 16px;
+        }
+        .diagrams-intro {
+            color: var(--subtext1);
+            margin: 0 0 12px 0;
+            line-height: 1.5;
+        }
+        .diagrams-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            counter-reset: diagram;
+        }
+        .diagram-row {
+            counter-increment: diagram;
+            margin-bottom: 8px;
+        }
+        .diagram-toggle {
+            width: 100%;
+            text-align: left;
+            background: var(--surface0);
+            border: 1px solid var(--surface1);
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+        .diagram-toggle:hover {
+            background: var(--surface1);
+        }
+        .diagram-toggle::before {
+            content: counter(diagram, decimal-leading-zero) ".";
+            color: var(--subtext0);
+            font-family: var(--mono);
+            font-size: 13px;
+            min-width: 28px;
+        }
+        .diagram-toggle.open {
+            background: var(--surface1);
+            border-color: var(--blue);
+        }
+        .diagram-title {
+            font-weight: 700;
+            color: var(--text);
+            min-width: 230px;
+        }
+        .diagram-blurb {
+            color: var(--subtext1);
+            font-size: 13px;
+            flex: 1;
+        }
+        .diagram-card {
+            background: white;
+            border: 1px solid var(--surface1);
+            border-radius: 4px;
+            padding: 12px;
+            margin: 6px 0 12px 28px;
+            text-align: center;
+        }
+        .diagram-svg {
+            max-width: 100%;
+            height: auto;
+            display: inline-block;
+        }
+        .glossary-search {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--surface1);
+            background: var(--mantle);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .glossary-search input {
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--base);
+            border: 1px solid var(--surface1);
+            border-radius: 4px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 14px;
+        }
+        .glossary-search input:focus {
+            border-color: var(--blue);
+            outline: none;
+        }
+        .glossary-content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+        }
+        .glossary-intro {
+            color: var(--subtext1);
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+        .glossary-entry {
+            margin-bottom: 14px;
+            padding-left: 10px;
+            border-left: 3px solid transparent;
+            transition: border-color 0.15s, background 0.15s;
+            /* leave a full line of breathing room above when
+               scroll_into_view lands on this entry, so the
+               blank space before the heading is visible (not
+               just the heading flush against the top edge) */
+            scroll-margin-top: 28px;
+        }
+        .glossary-entry h3 {
+            margin-top: 0;
+        }
+        .glossary-entry.matched {
+            border-left-color: var(--peach);
+            background: var(--surface0);
+            border-radius: 0 4px 4px 0;
+        }
+        .glossary-entry h3 {
+            color: var(--blue);
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .glossary-body {
+            color: var(--text);
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        /* Tutorial panel */
+        .tutorial-panel {
+            background: var(--mantle);
+            border-bottom: 1px solid var(--surface1);
+            padding: 16px 20px;
+            flex-shrink: 0;
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+        .tutorial-header {
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+            margin-bottom: 8px;
+        }
+        .tutorial-progress {
+            color: var(--peach);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .tutorial-header h2 {
+            color: var(--blue);
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+        }
+        .tutorial-intro {
+            color: var(--subtext1);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .tutorial-intro .lesson-paragraph {
+            margin: 0 0 10px 0;
+        }
+        .tutorial-intro .lesson-paragraph:last-child {
+            margin-bottom: 0;
+        }
+        .tutorial-intro .lesson-section {
+            color: var(--text);
+            font-size: 16px;
+            font-weight: 700;
+            margin: 14px 0 6px 0;
+            padding-bottom: 2px;
+            border-bottom: 1px solid var(--surface1);
+        }
+        .tutorial-intro .lesson-list {
+            margin: 4px 0 10px 0;
+            padding-left: 20px;
+        }
+        .tutorial-intro .lesson-list li {
+            margin-bottom: 4px;
+        }
+        .tutorial-intro .lesson-separator {
+            border: 0;
+            border-top: 1px dashed var(--surface1);
+            margin: 14px 0;
+        }
+        .tutorial-intro code {
+            background: var(--surface0);
+            padding: 1px 4px;
+            border-radius: 3px;
+            color: var(--text);
+        }
+        .tutorial-intro strong {
+            color: var(--text);
+            font-weight: 700;
+        }
+        .lesson-examples {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+        .lesson-example {
+            background: var(--base);
+            border: 1px solid var(--surface1);
+            border-radius: 4px;
+            padding: 6px 10px;
+            text-align: left;
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .lesson-example:hover {
+            background: var(--surface0);
+            border-color: var(--blue);
+        }
+        .example-prompt {
+            color: var(--green);
+            font-weight: 700;
+            margin-right: 4px;
+        }
+        .tutorial-tryit {
+            color: var(--yellow);
+            background: var(--base);
+            border-left: 3px solid var(--yellow);
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            border-radius: 0 4px 4px 0;
+        }
+        .tutorial-tryit strong {
+            color: var(--peach);
+        }
+        .tutorial-nav {
+            display: flex;
+            gap: 6px;
+        }
+        .tutorial-nav .ctrl-btn {
+            padding: 2px 10px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .tutorial-nav .ctrl-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .tutorial-subnav {
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+            margin: 4px 0 10px;
+        }
+        .tutorial-subnav h2 {
+            color: var(--blue);
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+        }
+        .tutorial-toc-intro {
+            color: var(--subtext1);
+            margin: 6px 0 12px;
+            font-size: 13px;
+        }
+        .toc-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        .toc-item {
+            background: var(--base);
+            border: 1px solid var(--surface1);
+            border-radius: 4px;
+            padding: 8px 10px;
+            text-align: left;
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            gap: 8px;
+            align-items: baseline;
+        }
+        .toc-item:hover {
+            background: var(--surface0);
+            border-color: var(--blue);
+        }
+        .toc-item.current {
+            border-color: var(--peach);
+            background: var(--surface0);
+        }
+        .toc-num {
+            color: var(--peach);
+            font-weight: 700;
+            min-width: 22px;
+        }
+        .toc-title {
+            color: var(--text);
+        }
+    </style>
+    <!-- Saga 33 step 030: Plotly for the interactive 3D viz
+         used by the dim-reduction demos. Loaded once at page
+         init; the `plotly3d` viz type returns an HTML fragment
+         with an embedded `Plotly.newPlot(...)` call. Integrity
+         hash deliberately omitted; if you want SRI, compute it
+         locally (`openssl dgst -sha384 -binary plotly-2.35.2.min.js
+         | base64`) and add an integrity attribute. -->
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" crossorigin="anonymous"></script>
+<link rel="modulepreload" href="/mlpl-web-24e25a18aa87456e.js" crossorigin="anonymous" integrity="sha384-Zs08PnhVrnZpKJi4YI8Pz0X9HZHDUzZWuxlypQeyYszg+JRoRCAB7KBFVVOolzjj"><link rel="preload" href="/mlpl-web-24e25a18aa87456e_bg.wasm" crossorigin="anonymous" integrity="sha384-3VW4sfdORiIwiLKVykJDaSvvaAZgfpIb4855ASEXadv/BXpaRSNGQhr1bGNJY93j" as="fetch" type="application/wasm"></head>
+<body>
+    <div id="app"></div>
+    <script>
+    window.__initResize = function(handle) {
+        console.log('[resize] initResize called', handle);
+        let dragging = false, startY = 0, startH = 0, outputEl = null;
+        handle.addEventListener('mousedown', function(e) {
+            console.log('[resize] mousedown on handle');
+            outputEl = document.querySelector('.viz3d-split .output') || document.getElementById('output');
+            if (!outputEl) return;
+            dragging = true;
+            startY = e.clientY;
+            startH = outputEl.getBoundingClientRect().height;
+            document.body.style.cursor = 'ns-resize';
+            document.body.style.userSelect = 'none';
+            e.preventDefault();
+            e.stopPropagation();
+        });
+        document.addEventListener('mousemove', function(e) {
+            if (!dragging || !outputEl) return;
+            var h = Math.max(40, Math.min(window.innerHeight * 0.7, startH + (e.clientY - startY)));
+            outputEl.style.setProperty('height', h + 'px', 'important');
+            outputEl.style.setProperty('flex-basis', h + 'px', 'important');
+            e.preventDefault();
+        });
+        document.addEventListener('mouseup', function() {
+            if (dragging) { document.body.style.cursor = ''; document.body.style.userSelect = ''; }
+            dragging = false; outputEl = null;
+        });
+    };
+    </script>
+    <footer>
+        <span>Copyright &copy; 2026 Michael A Wright</span>
+        <span class="footer-sep">|</span>
+        <a href="https://github.com/sw-ml-study/sw-mlpl/blob/main/LICENSE">MIT License</a>
+        <span class="footer-sep">|</span>
+        <a href="https://github.com/sw-ml-study/sw-mlpl">Repository: sw-ml-study/sw-mlpl</a>
+    </footer>
+</body>
+</html>
